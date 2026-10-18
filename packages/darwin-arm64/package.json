@@ -1,0 +1,29 @@
+{
+  "name": "@sebastienelet/herdr-issue-worktree-darwin-arm64",
+  "version": "1.0.0",
+  "description": "Native state companion for the Herdr issue worktree plugin.",
+  "license": "BSD-2-Clause",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SebastienElet/herdr-issue-worktree.git",
+    "directory": "packages/darwin-arm64"
+  },
+  "files": [
+    "bin/herdr-issue-state",
+    "licenses/",
+    "THIRD_PARTY_NOTICES"
+  ],
+  "os": [
+    "darwin"
+  ],
+  "cpu": [
+    "arm64"
+  ],
+  "exports": {
+    "./herdr-issue-state": "./bin/herdr-issue-state"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  }
+}

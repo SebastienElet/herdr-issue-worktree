@@ -1,0 +1,58 @@
+{
+  "name": "@sebastienelet/herdr-issue-worktree",
+  "version": "1.0.0",
+  "description": "Start or resume issue work through Herdr.",
+  "license": "BSD-2-Clause",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SebastienElet/herdr-issue-worktree.git"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "files": [
+    "*.ts",
+    "herdr-plugin.toml",
+    "skills/",
+    "src/",
+    "Cargo.toml",
+    "Cargo.lock",
+    "rust-toolchain.toml"
+  ],
+  "os": [
+    "darwin"
+  ],
+  "cpu": [
+    "arm64"
+  ],
+  "type": "module",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
+  "scripts": {
+    "test": "bun --config=/dev/null --no-env-file test",
+    "typecheck": "tsc --noEmit",
+    "lint": "oxlint --type-aware --deny-warnings .",
+    "format": "oxfmt .",
+    "format:check": "oxfmt --check .",
+    "build": "cargo build --release --locked && mkdir -p packages/darwin-arm64/bin && cp target/release/herdr-issue-state packages/darwin-arm64/bin/herdr-issue-state"
+  },
+  "dependencies": {
+    "zod": "4.6.6"
+  },
+  "devDependencies": {
+    "@types/bun": "1.4.2",
+    "oxfmt": "0.72.0",
+    "oxlint": "1.87.0",
+    "oxlint-tsgolint": "7.0.2004",
+    "typescript": "7.0.2"
+  },
+  "optionalDependencies": {
+    "@sebastienelet/herdr-issue-worktree-darwin-arm64": "1.0.0"
+  },
+  "engines": {
+    "bun": "1.4.3"
+  },
+  "packageManager": "bun@1.4.3"
+}

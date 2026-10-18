@@ -1,0 +1,4 @@
+node_modules/
+target/
+packages/darwin-arm64/bin/
+*.tgz

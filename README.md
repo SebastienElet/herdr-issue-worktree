@@ -1,0 +1,180 @@
+# Issue Worktree
+
+Version 1.0.0 is prepared locally; registry publication and native release qualification are pending.
+
+Ctrl-click a GitHub, GitLab or Linear issue URL in Herdr to choose Claude or Codex.
+This is the standalone issue entry point. For a task already assigned by Herdr Projects, continue
+in its thread with its brief and report rather than starting this preparation workflow.
+The two plugins have separate registries: the click launcher's bindings do not deduplicate Projects
+assignments.
+Escape or an empty provider answer cancels. Confirm a matching repository suggestion, or enter an
+absolute repository path; cancellation before confirmation starts no agent and creates no checkout.
+GitHub repository names and issue keys compare without owner/project casing differences;
+the clicked URL and context retain their original text. Other hosting paths keep their exact comparison.
+Linear always requires an explicit repository, followed by the composed workflow's read-only preflight.
+
+The plugin retains the complete clicked URL and workspace context as JSON data. Git inspection uses
+argv, canonical paths, verified remotes and bounded subprocesses, with inherited Git overrides removed.
+The selected provider runs a preparation agent in a new native source tab or workspace, preserving
+focus. Preparation reads the authenticated tracker and composes the installed
+`herdr-issue-worktree` skill. That workflow owns the final native linked worktree, current identifier
+and exact title, checkout policy and implementation handoff. Repository instructions and composed
+workflows retain branch, eligibility, pull-request and lifecycle decisions.
+
+New agents receive a short private-file reference through native `agent start --` arguments. The
+complete request is a JSON string in a mode-0600 file inside a mode-0700 per-launch directory under
+the binding directory. Only the base64-encoded JSON path travels through the shell; the agent reads
+and parses the full request. References exceeding 768 UTF-8 bytes are refused before launch. This
+avoids the long-input truncation reported while Herdr 0.9.3 shells start
+([upstream #4950](https://github.com/herdrdev/herdr/issues/4950)). Files remain available for manual
+inspection; do not remove a request while its agent may still need it. A timeout can occur after
+execution has begun; startup errors trigger inspection, never another launch or prompt.
+No trust dialog is answered. The picker reports preparation state, not verified implementation success.
+
+Complete identities live in the Rust companion's `bindings.json`, under the per-socket dispatch
+directory. Native metadata carries only bounded display hints: Herdr 0.9.3 normalizes values to
+80 characters and discards these tokens on restart. Display-hint failures emit a structured warning
+after durable persistence and do not abort startup; persistence failures still stop it. Registration preserves canonical issue identity,
+Git paths, title and native handles. Unknown versions, duplicate keys, corrupt state and state
+symlinks are refused without replacing the original data. Writes compare the complete prior map
+under an exclusive file lock; another pane cannot register the same issue and role. Definite busy/stale
+writes retry at most three times after rereading and rechecking ownership, while requiring the target
+pane binding to remain unchanged. Unknown write outcomes, changed occupants/owners and exhausted
+contention retain state for inspection.
+
+Repeated clicks inspect durable bindings and native state and check Git common directory, linked checkout,
+workspace label, branch, provider, pane occupant, cwd and stored session reference. Working agents
+are retained without input. **Existing idle agents require continuation in their retained pane.**
+Automatic continuation remains blocked on Herdr 0.9.3: `agent.prompt` accepts a working agent and
+has no expected-session precondition; a managed name can survive a same-provider session change.
+See the installed-version [prompt implementation](https://github.com/ogulcancelik/herdr/blob/v0.9.3/src/app/api/agents.rs#L103)
+and [name ownership reconciliation](https://github.com/ogulcancelik/herdr/blob/v0.9.3/src/terminal/state.rs#L2353).
+
+A per-session, per-issue exclusive reservation under `HERDR_PLUGIN_STATE_DIR/dispatch/` prevents
+concurrent picker processes from provisioning twice. Normal outcomes release it. Interrupted or
+uncertain dispatches retain it and report its path. Inspect native panes, agents and Git worktrees
+before manually removing an abandoned reservation; elapsed time does not prove a request was unapplied.
+Read-only reuse runs before acquiring a creation reservation, so a retained reservation does not
+prevent inspection of the existing work. Preparation and registration use the captured native socket
+explicitly; an agent tool's ambient environment can belong to another session.
+A source-only preflight rejection creates no pane or agent and releases its unused reservation;
+refresh the selection before another click. Once a native creation or startup may have occurred,
+uncertainty retains the reservation and resources. SCP hostnames use the same lowercase identity
+as URL hostnames; repository paths retain their provider-specific comparison.
+Closed native panes/workspaces retain their bindings and block another launch for manual inspection.
+This conservative policy was explicitly retained: Herdr 0.9.3 can finish a
+[queued worktree creation](https://github.com/herdrdev/herdr/blob/v0.9.3/src/app/api/worktrees/deferred.rs#L372)
+after its source workspace closes. Missing resources alone do not prove that all work stopped.
+Collisions, incompatible repositories, changed occupants and unavailable identity stop the launch.
+
+## Installation and validation
+
+Target: macOS ARM64. The manifest retains Herdr's declared minimum 0.9.3; this is not a
+qualification of every later Herdr version. Bun 1.4.3, Git, the selected Codex or Claude provider,
+authenticated tracker access and the composed skills must be available. The Linear path requires
+`linear-start` and `linear-workflow` from their owner. Herdr Projects is separate.
+
+After the packages are published and qualified, install into a durable directory:
+
+```sh
+mkdir -p "$HOME/.local/share/herdr-issue-worktree"
+cd "$HOME/.local/share/herdr-issue-worktree"
+bun install --exact --ignore-scripts @sebastienelet/herdr-issue-worktree@1.0.0
+herdr plugin link "$PWD/node_modules/@sebastienelet/herdr-issue-worktree"
+```
+
+The exact optional package `@sebastienelet/herdr-issue-worktree-darwin-arm64@1.0.0` contains the
+prebuilt `herdr-issue-state` companion. Missing/non-executable companions and unsupported platforms
+are refused; installation does not compile, download a fallback or run lifecycle scripts.
+Keep the installation's manifest and Bun lockfile; use `bun install --frozen-lockfile --ignore-scripts`
+when reproducing it. A persistent plugin or skill must not point into a `bunx` cache.
+
+Expose the packaged `skills/herdr-issue-worktree` directory in the selected provider's user skill
+directory using `ln -s <absolute-packaged-skill-path> <provider-user-skill-directory>/herdr-issue-worktree`.
+An existing destination is a collision: inspect ownership before explicitly substituting it; do not
+force the link or leave a second copy active. The package contains the skill's references and evals.
+No other skill collection or cleanup plugin is bundled or activated.
+
+Before substituting an existing plugin, stop new issue actions, record its current registration
+with `herdr plugin list`, and inspect pending launches. Preserve `dotfiles.issue-worktree`, the
+Herdr-provided state directory, `dispatch/<sha256(HERDR_SOCKET_PATH)>`, `bindings.json` v1, reservations
+and prompt files. Disable the old registration with `herdr plugin disable dotfiles.issue-worktree`,
+then remove only its owned registration with `herdr plugin unlink dotfiles.issue-worktree` before
+linking the new durable package. Never purge or rebind state to make an installation succeed.
+Verify resources, bindings, preparation, resume and duplicate refusal in a disposable native session
+before removing old source/builds. For rollback, disable/unlink the new registration, restore the
+recorded prior link or exact package and its skill, then inspect the same bindings. Uninstalling is
+explicit disable/unlink plus `bun remove @sebastienelet/herdr-issue-worktree` in its installation
+directory, preserving state and foreign configuration; no workspace is closed automatically.
+
+For source contribution:
+
+```sh
+bun install --frozen-lockfile --ignore-scripts
+bun run build
+bun test
+bun run format:check
+bun run lint
+bun run typecheck
+cargo fmt --all --check
+cargo check --workspace --all-targets --all-features --locked
+cargo clippy --workspace --all-targets --all-features --locked -- -D warnings
+cargo test --workspace --all-features --locked
+RUSTDOCFLAGS=-Dwarnings cargo doc --workspace --all-features --no-deps --locked
+```
+
+Rust 1.98.1 is needed only for contribution/builds. CI transfers the existing checks: all plugin
+TypeScript tests on macOS ARM64 and companion checks on macOS/Ubuntu. These suites use disposable
+Git repositories and substitute native Herdr responses; they do not prove a live tracker/agent flow.
+`bun pm pack --ignore-scripts` at the root and in `packages/darwin-arm64` produces local archives.
+Native dependency and Rust standard-library notices accompany the variant.
+
+The manual `ci.yml` publication job on `main` publishes the native variant before the entry package,
+using only `npm publish --provenance` with OIDC on GitHub-hosted runners. Configure an npm trusted
+publisher for **each** package against the future public repository
+`SebastienElet/herdr-issue-worktree`, workflow `ci.yml`; no token fallback is configured.
+See [npm trusted publishing](https://docs.npmjs.com/trusted-publishers/) and
+[Bun archive preparation](https://bun.sh/docs/pm/cli/pm#pack).
+Publication is not atomic: after a partial/unknown result, inspect registry version, integrity and
+provenance before publishing the remaining package; never unpublish or blindly retry. No published
+artifact, provenance or assembled native release has been verified by this local preparation.
+
+Historical native observations below retain their original dates and environments; they are not
+release qualification for this package.
+
+On 2026-10-07, macOS ARM64 with Herdr client/server 0.9.3 (protocol 22) and Bun 1.4.0:
+
+- Native manifest linking and Moon's expanded task inspection succeeded; the full installation task
+  was not run from this worktree.
+- A real Ctrl-click in an isolated named session opened the provider popup with the full synthetic
+  GitHub URL, query and fragment. Escape left the original pane, agent count and focus IDs unchanged.
+  A second activation while the popup was open was refused without replacing it.
+- Native source creation and metadata reporting retained the returned pane/cwd and all focus IDs.
+- A new Codex launch accepted an encoded initial prompt containing shell syntax and control
+  characters. It stopped at trust with the expected provider/cwd and unchanged focus. No trust UI was
+  answered; prompt execution and directory confirmation after trust remain unverified.
+
+On 2026-10-08, a disposable authenticated local tracker returned a synthetic issue and a title longer
+than 80 characters. After the user approved source-repository trust, Codex provisioned the native
+linked worktree, registered its complete binding, and launched a final Codex agent with the full URL
+and verified Git context. Its transcript confirmed directory, top-level and branch before creating
+the requested fixture file. Independent rereads confirmed the exact file bytes, title, branch,
+common directory, unchanged source HEAD and focus. A second dispatch issued only snapshot reads and
+retained the same pane. After restarting the owned test server, native tokens were empty and the
+complete binding still identified the same linked checkout without creation or input.
+
+A subsequent audit reproduced nested JSON escape loss through Herdr 0.9.3's
+[POSIX quoting path](https://github.com/herdrdev/herdr/blob/v0.9.3/src/platform/macos.rs#L208) under Fish.
+The base64 transport was then exercised through a new native Codex launch in a ready Fish pane:
+its incoming request matched all 1,018 original bytes, and the final 409-byte fixture matched exactly,
+including nested JSON, quotes, backslashes, control escapes and Unicode. Source HEAD and focus stayed
+unchanged; data containing shell syntax created no side effect.
+
+The installed runtime did not expose `agent_session` in these Codex observations. The plugin retained
+an explicit pending state instead of claiming verified working-session reuse. Verified working reuse
+with a native session reference is covered by the owned tests. Earlier native experiments exposed
+ambient socket drift; the corrected prompt and registration command pass the intended connection
+explicitly, and the corrected disposable scenario stayed in its named session.
+
+Live tracker lifecycle writes and automatic continuation were not exercised. Linux CI covers portable code only;
+native Linux, Windows/WSL, remote machines and other Herdr versions were not exercised.
