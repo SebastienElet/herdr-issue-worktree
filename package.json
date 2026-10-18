@@ -39,7 +39,7 @@
     "build": "cargo build --release --locked && mkdir -p packages/darwin-arm64/bin && cp target/release/herdr-issue-state packages/darwin-arm64/bin/herdr-issue-state"
   },
   "dependencies": {
-    "zod": "4.6.6"
+    "zod": "4.6.7"
   },
   "devDependencies": {
     "@types/bun": "1.4.2",
